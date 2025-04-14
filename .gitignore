@@ -11,3 +11,4 @@ wheels/
 
 .ruff_cache
 data/
+lightning_logs/

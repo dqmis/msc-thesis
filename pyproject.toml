@@ -4,19 +4,35 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
+
+
 dependencies = [
+    "cvxpy>=1.6.0",
+    "gurobipy>=12.0.1",
+    "lightning>=2.5.0.post0",
     "matplotlib>=3.10.0",
+    "mosek>=11.0.14",
     "numpy>=2.2.2",
+    "ortools>=9.12.4544",
     "pandas>=2.2.3",
+    "pyarrow>=19.0.0",
+    "pyscipopt>=5.4.1",
     "requests>=2.32.3",
     "scikit-learn>=1.6.1",
-    "scipy>=1.15.1",
+    "scipy==1.13",
+    "sdpa-python>=0.2.2",
+    "seaborn>=0.13.2",
     "torch>=2.6.0",
+    "types-requests>=2.32.0.20241016",
 ]
 
 [dependency-groups]
 dev = ["ipykernel>=6.29.5", "mypy>=1.14.1", "ruff>=0.9.4"]
 
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.mypy]
 files = "src/**/*.py"
