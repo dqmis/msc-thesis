@@ -11,12 +11,16 @@ def sample_data_for_group(
     group_key: str,
     data: np.ndarray,
     naive_sampling: bool = True,
+    seed: int = 0,
 ) -> tuple[np.ndarray, list[int], list[int]]:
     """
     Sample users from groups and return the sampled data, consumer ids, and group assignments.
     If naive_sampling is True, it samples random producer indices.
     Otherwise, it samples the top producers for each consumer.
     """
+
+    np.random.seed(seed)
+    rng = np.random.default_rng(seed)
 
     initial_allocation = _compute_group_allocations(n_consumers, groups_map, group_key)
 
@@ -32,7 +36,6 @@ def sample_data_for_group(
     # Use your helper to parse the groups of the sampled users.
     group_assignments = _parse_groups_ids(consumers_ids, groups_map, group_key)
 
-    rng = np.random.default_rng()
     if naive_sampling:
         # Sample random item indices.
         sampled_producers = rng.choice(data.shape[1], size=n_producers, replace=False)

@@ -19,19 +19,23 @@ def compute_consumer_producer_utils(
     solver: str,
     method: str = "mean",
     method_kwargs: dict[str, Any] | None = None,
+    normalize: bool = True,
 ) -> tuple[list[float], list[float]]:
     greedy_allocations_per_consumer = np.sort(rel_matrix, axis=1)[:, -k_rec:].sum(axis=1)
 
     _, producer_assignments = compute_consumer_optimal_solution(
-        rel_matrix,
-        k_rec,
-        gamma,
-        producer_max_min_utility,
+        rel_matrix=rel_matrix,
+        k_rec=k_rec,
+        producer_max_min_utility=producer_max_min_utility,
+        gamma=gamma,
         method=method,
         solver=solver,
         **(method_kwargs or {}),
     )
-    consumers_utils = (rel_matrix * producer_assignments).sum(axis=1) / greedy_allocations_per_consumer
+    if normalize:
+        consumers_utils = (rel_matrix * producer_assignments).sum(axis=1) / greedy_allocations_per_consumer
+    else:
+        consumers_utils = (rel_matrix * producer_assignments).sum(axis=1)
     producers_utils = producer_assignments.sum(axis=0)
 
     return consumers_utils, producers_utils
@@ -50,9 +54,8 @@ def compute_utils_per_params(
     use_naive_sampling: bool = True,
     method: str = "mean",
     n_runs: int = 1,
+    normalize: bool = True,
 ) -> dict[str, dict[str, dict[str, list[ConsumerResult]]]]:
-    random_seed(42)
-
     if alphas is None:
         if method == "cvar":
             raise ValueError("Alpha must be provided for CVaR method.")
@@ -61,7 +64,7 @@ def compute_utils_per_params(
     results = {}
     for group_key in group_keys:
         group_results = defaultdict(lambda: defaultdict(list[ConsumerResult]))
-        for _ in tqdm(range(n_runs), position=0, leave=True, desc="Runs"):
+        for run_id in tqdm(range(n_runs), position=0, leave=True, desc="Runs"):
             rel_matrix_sampled, consumer_ids, group_assignments = sample_data_for_group(
                 n_consumers=n_consumers,
                 n_producers=n_producers,
@@ -69,6 +72,7 @@ def compute_utils_per_params(
                 group_key=group_key,
                 data=rel_matrix,
                 naive_sampling=use_naive_sampling,
+                seed=run_id
             )
 
             producer_max_min_utility, _ = compute_producer_optimal_solution(
@@ -86,6 +90,7 @@ def compute_utils_per_params(
                         k_rec,
                         method=method,
                         solver=solver,
+                        normalize=normalize,
                         method_kwargs={
                             "alpha": alpha,
                             "group_assignments": group_assignments,
@@ -113,10 +118,10 @@ def _parse_results_per_group_value(
                 for distinct_group in set(run_consumer_groups):
                     run_consumer_groups_idx = np.where(np.array(run_consumer_groups) == distinct_group)[0]
                     group_results[distinct_group][alpha][gamma].append(
-                        run_consumers_utils[run_consumer_groups_idx]
+                        run_consumers_utils[run_consumer_groups_idx].tolist()
                     )
                     group_results["all"][alpha][gamma][run_id].extend(
-                        run_consumers_utils[run_consumer_groups_idx]
+                        run_consumers_utils[run_consumer_groups_idx].tolist()
                     )
 
     return group_results
