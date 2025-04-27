@@ -1,0 +1,58 @@
+method,group,mean_utility
+min,all,0.9322413810649026
+min,tools and home improvement,0.9331850616290028
+min,electronics,0.931891821842829
+min,pet supplies,0.9289614162314906
+min,grocery and gourmet food,0.9372449349358212
+min,office products,0.938081694987703
+min,sports and outdoors,0.9290042615759903
+min,video games,0.9347473479528239
+min,digital music,0.9389883090456163
+min,automotive,0.9337009536392933
+min,toys and games,0.931430624645386
+min,home and kitchen,0.935059986269987
+min,clothing shoes and jewelry,0.9311559845511028
+min,beauty,0.9328078579600619
+min,ratings patio lawn and garden,0.9281787252463554
+min,cell phones and accessories,0.9322261389760798
+min,cds and vinyl,0.9319561702966278
+min,musical instruments,0.9307698630045171
+min,baby,0.9313729875894372
+mean,all,0.9871710233034653
+mean,tools and home improvement,0.9872822725784749
+mean,electronics,0.9872147565634903
+mean,pet supplies,0.9870654756285553
+mean,grocery and gourmet food,0.9867851692785317
+mean,office products,0.9858707574586087
+mean,sports and outdoors,0.9874263878857593
+mean,video games,0.9869943004836886
+mean,digital music,0.9875944928555088
+mean,automotive,0.9870789307751531
+mean,toys and games,0.9870084740457457
+mean,home and kitchen,0.9871448266108593
+mean,clothing shoes and jewelry,0.9873585869998563
+mean,beauty,0.9874676862357582
+mean,ratings patio lawn and garden,0.9863515855259983
+mean,cell phones and accessories,0.9866408387016079
+mean,cds and vinyl,0.9867901658694355
+mean,musical instruments,0.9870367017996121
+mean,baby,0.9883376784194668
+cvar,all,0.9867479257117516
+cvar,tools and home improvement,0.9867556900916498
+cvar,electronics,0.9867363336478531
+cvar,pet supplies,0.9867584983114951
+cvar,grocery and gourmet food,0.9867544825764278
+cvar,office products,0.9868005758226467
+cvar,sports and outdoors,0.986746563088097
+cvar,video games,0.9867518226689165
+cvar,digital music,0.9867982643103683
+cvar,automotive,0.9867608122349684
+cvar,toys and games,0.9867520830481705
+cvar,home and kitchen,0.9867453232225026
+cvar,clothing shoes and jewelry,0.9867372914876453
+cvar,beauty,0.9867521552927377
+cvar,ratings patio lawn and garden,0.9868580650024221
+cvar,cell phones and accessories,0.9867558296523747
+cvar,cds and vinyl,0.9867417393580251
+cvar,musical instruments,0.9869162014846595
+cvar,baby,0.9867646487062899
