@@ -1,9 +1,10 @@
+from collections import defaultdict
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from collections import defaultdict
+
 
 def plot_groups_results_per_gamma(
     results: dict,
@@ -77,6 +78,7 @@ def plot_groups_results_per_gamma(
         f"{save_path}/{method}_tradeoff_curve_group_{groups_key}_n_consumers_{n_consumers}_n_producers_{n_producers}_n_runs_{n_runs}_k_rec_{k_rec}_alpha_{alpha}.png"
     )
 
+
 def plot_groups_results_means_per_alpha(
     results: dict,
     groups_key: str,
@@ -112,7 +114,6 @@ def plot_groups_results_means_per_alpha(
                     results_per_gamma_p95[gamma][alpha].append(np.percentile(run, axis=0, q=95))
                     results_per_gamma_p05[gamma][alpha].append(np.percentile(run, axis=0, q=5))
 
-
     for gamma, alpha_results in results_per_gamma_p50.items():
         x_alphas = []
         p50s = []
@@ -126,7 +127,6 @@ def plot_groups_results_means_per_alpha(
             p50s.append(p50)
             p95s.append(p95)
             p5s.append(p5)
-
 
         plt.plot(
             x_alphas,
