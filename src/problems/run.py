@@ -14,7 +14,7 @@ ConsumerResult = tuple[list[float], list[float]]
 
 
 def simple_sample(data: np.ndarray, sample_m: int, sample_n: int, seed: int = 0) -> np.ndarray:
-    rng = np.random.default_rng(seed)
+    rng = np.random.default_rng()
 
     m, n = data.shape
     users = rng.choice(m, size=sample_m, replace=False)
