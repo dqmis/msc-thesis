@@ -389,6 +389,21 @@ wheels = [
 ]
 
 [[package]]
+name = "cvxpylayers"
+version = "0.1.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cvxpy" },
+    { name = "diffcp" },
+    { name = "numpy" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cc/37/9ce623f5f583fe116d6d784f4a90b64e3d291802bc6f207f8653ae896f5f/cvxpylayers-0.1.9.tar.gz", hash = "sha256:aa72a475b28930b09855acbddce21ef3c1226aa3d86fec3dedc27afe5329f5f8", size = 29696 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/01/e2fd0ee99b0d24297fc3c1469b27d36084f72c411778e30ae29786230bc1/cvxpylayers-0.1.9-py3-none-any.whl", hash = "sha256:8b3d547ca1862462c290e4767b12b67beeda2bacc8db7106f7c8aec35f17be59", size = 31689 },
+]
+
+[[package]]
 name = "cycler"
 version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
@@ -430,6 +445,25 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604 },
+]
+
+[[package]]
+name = "diffcp"
+version = "1.1.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "threadpoolctl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b9/27/9bdcc0b0559f452d2746a19e525c2f78361ed2fc0a909079030f8793dc5a/diffcp-1.1.4.tar.gz", hash = "sha256:2c7aac13544fedcf858b33fec6aaf50cc8be6e6996ac6a54a46697e2697ab24c", size = 2136239 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/7d/36697377fafc6034ed8bcde313d7752e8a75be81fa64b502968d58217cdf/diffcp-1.1.4-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:40c573b63167cf9bc71b24a423826b74ff05ff425b66b081ac3566e2eb72589c", size = 224593 },
+    { url = "https://files.pythonhosted.org/packages/95/d5/dcc67effa470fa60525ef0c28f7e47c698baf056eb048af26eb23ea0bde7/diffcp-1.1.4-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e46fa2aac1c69e4d17c71ca134bbdacc32fe7be6634198526806fe6b335a0ef9", size = 200553 },
+    { url = "https://files.pythonhosted.org/packages/5c/a4/6e162ed7cf8ba42c87ba179cecb3f623ebe0360dffc9983246fb866391ff/diffcp-1.1.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cc655c4af380214fae477dcbbf4ef23e424dbb78471ce5cfe292c6823f605c8d", size = 248254 },
+    { url = "https://files.pythonhosted.org/packages/1c/66/7c6bd013e9a45adfba594d334eec8040f87d909587a7968357399d9e1005/diffcp-1.1.4-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:5ec267629777d0143844a645625abe45f98999ef0e83635c9f30f6789a97f373", size = 1233577 },
+    { url = "https://files.pythonhosted.org/packages/84/e1/ca171d30689a8ba4afebbc3b347c55c3af19405059a2fad96586cbee8b3b/diffcp-1.1.4-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:c50dccc6c144f536a8490e17dc426b176664ea318dce66a87d82e4498916203f", size = 224676 },
+    { url = "https://files.pythonhosted.org/packages/f5/cc/c9296b23c8b3b26ce2203551d32e3a9969ee03bc2c31b2ccd2a8c8f0d2a1/diffcp-1.1.4-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:f928ddc032f2f18e284c585f7b70a58b16cde6980ae79bf8a624fa9f8e029804", size = 200617 },
+    { url = "https://files.pythonhosted.org/packages/4c/85/96ecee50162c2db0bbee7506520d0fb16c7a4595e32e6a21141f71e4f2ff/diffcp-1.1.4-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bfc188ade6f87a0a2aac3016e4e5ea54d4004ac8eaa546db3963425c46eabaf8", size = 248271 },
+    { url = "https://files.pythonhosted.org/packages/b6/b2/5853f108d38b1fbbd20130adf75c017480e8c897cc9f0227ebfcaa603c9c/diffcp-1.1.4-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:d9031caf41ba01a5942df1b69ac4600d68973bf0db1c71ae4892ca9d4c8d34e9", size = 1233630 },
 ]
 
 [[package]]
@@ -2265,6 +2299,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "cvxpy" },
+    { name = "cvxpylayers" },
     { name = "gurobipy" },
     { name = "lightning" },
     { name = "matplotlib" },
@@ -2293,6 +2328,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "cvxpy", specifier = ">=1.6.0" },
+    { name = "cvxpylayers", specifier = ">=0.1.9" },
     { name = "gurobipy", specifier = ">=12.0.1" },
     { name = "lightning", specifier = ">=2.5.0.post0" },
     { name = "matplotlib", specifier = ">=3.10.0" },

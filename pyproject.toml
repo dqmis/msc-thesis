@@ -8,6 +8,7 @@ requires-python = ">=3.12"
 
 dependencies = [
     "cvxpy>=1.6.0",
+    "cvxpylayers>=0.1.9",
     "gurobipy>=12.0.1",
     "lightning>=2.5.0.post0",
     "matplotlib>=3.10.0",

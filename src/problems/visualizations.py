@@ -202,6 +202,7 @@ def plot_groups_results_std_per_alpha(
             label=f"$\gamma$ {gamma}",
             marker="s",
             markersize=3,
+            linewidth=2,
         )
         plt.fill_between(
             x_alphas,
