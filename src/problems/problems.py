@@ -262,8 +262,8 @@ def _compute_consumer_optimal_solution_cvar(
     cvar_obj = rho + (1.0 / ((1 - alpha) * G)) * cp.sum(t)
 
     prob = cp.Problem(cp.Minimize(cvar_obj), constraints)
-    # prob.solve(solver=cp.GUROBI, warm_start=True, **{"MIPGap": 1e-3})
-    prob.solve(solver=solver)
+    prob.solve(solver=cp.GUROBI, warm_start=True, **{"MIPGap": 1e-3})
+    # prob.solve(solver=solver)
 
     return prob.value, x.value
 
