@@ -106,7 +106,7 @@ def compute_consumer_optimal_solution_cvar_grad(
     verbose: bool = False,
     max_patience: int = 5,
     patience_delta: float = 1e-4,
-) -> np.ndarray:
+) -> tuple[np.ndarray, list[tuple[float, float, float, float, float, float]]]:
     _INITIAL_TAU = 1.0
     _FINAL_TAU = 0.001
     _ANNEAL_RATE = 0.999
@@ -121,6 +121,7 @@ def compute_consumer_optimal_solution_cvar_grad(
     opt = optim.Adam(model.parameters(), lr=1e-3)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, patience=100, factor=0.5)
 
+    losses = []
     tau = 1
     best_loss = float(1e10)
     for epoch in range(1, max_epochs + 1):
@@ -168,10 +169,11 @@ def compute_consumer_optimal_solution_cvar_grad(
 
         if (epoch % 500 == 0 or epoch == 1) and verbose:
             _log_losses(loss, l_util, l_card, l_prod, l_bin, model.rho, tau, model.grad_norm, epoch)
+            losses.append((loss.item(), l_util.item(), l_card.item(), l_prod.item(), l_bin.item(), tau))
 
     torch.load("best_model.pth", model.state_dict())
     model_allocations = torch.sigmoid(model.eval().forward() / tau).detach().numpy()
-    return model_allocations
+    return model_allocations, losses
     return model_allocations
     return model_allocations
     return model_allocations
