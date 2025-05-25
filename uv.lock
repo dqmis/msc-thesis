@@ -2313,6 +2313,7 @@ dependencies = [
     { name = "scipy" },
     { name = "sdpa-python" },
     { name = "seaborn" },
+    { name = "sympy" },
     { name = "torch" },
 ]
 
@@ -2342,6 +2343,7 @@ requires-dist = [
     { name = "scipy", specifier = "==1.13" },
     { name = "sdpa-python", specifier = ">=0.2.2" },
     { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "sympy", specifier = ">=1.13.1" },
     { name = "torch", specifier = ">=2.6.0" },
 ]
 

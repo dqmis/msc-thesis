@@ -109,7 +109,7 @@ def compute_consumer_optimal_solution_cvar_grad(
 ) -> tuple[np.ndarray, list[tuple[float, float, float, float, float, float]]]:
     _INITIAL_TAU = 1.0
     _FINAL_TAU = 0.001
-    _ANNEAL_RATE = 0.999
+    _ANNEAL_RATE = 0.995
     _MAX_NORM = 5
 
     _rel_matrix = torch.tensor(rel_matrix)
@@ -174,13 +174,96 @@ def compute_consumer_optimal_solution_cvar_grad(
     torch.load("best_model.pth", model.state_dict())
     model_allocations = torch.sigmoid(model.eval().forward() / tau).detach().numpy()
     return model_allocations, losses
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
-    return model_allocations
+
+
+def compute_consumer_optimal_with_augmented_lagrangian_cvar(
+    rel_matrix: np.ndarray,
+    group_assignments: np.ndarray,
+    alpha_cvar: float,
+    k_rec: int,
+    producer_max_min_utility: float,
+    gamma: float,
+    lr_primal: float = 1e-2,
+    lr_dual: float = 1e-2,
+    rho: float = 10.0,
+    max_epochs: int = 5000,
+    verbose: bool = False,
+) -> torch.Tensor:
+    """
+    Augmented Lagrangian primal-dual solver:
+      maximize mean utility under sum_j A[i,j]=k_rec and sum_i A[i,j]>=gamma*U constraints.
+
+    Args:
+        rel_matrix: (n, m) tensor of relevances.
+        allocations: (n, m) tensor for storing allocation results.
+        group_assignments: (n,) tensor for consumer group assignments.
+        k_rec: per-consumer recommendation count.
+        producer_max_min_utility: U_max reference.
+        gamma: fraction of U_max floor.
+        lr_primal: LR for primal (alloc) Adam.
+        lr_dual: LR for dual ascent.
+        rho: penalty parameter for augmented terms.
+        max_epochs: training steps.
+        verbose: print diagnostics.
+    Returns:
+        A: (n, m) allocation matrix in [0,1].
+    """
+
+    rel_matrix = torch.tensor(rel_matrix, dtype=torch.float32)
+    group_assignments = torch.tensor(group_assignments, dtype=torch.int64)
+
+    class CVaRModule(nn.Module):
+        def __init__(self, n: int, m: int):
+            super().__init__()
+            self.rho_cvar = nn.Parameter(torch.zeros(1))
+            self.logits = nn.Parameter(torch.zeros(n, m))
+
+    model = CVaRModule(rel_matrix.shape[0], rel_matrix.shape[1])
+
+    n, m = rel_matrix.shape
+    # primal logits
+    # dual vars
+    alpha = torch.zeros(n, requires_grad=False)
+    beta = torch.zeros(m, requires_grad=False)
+    min_prod = math.ceil(producer_max_min_utility * gamma)
+
+    opt = optim.AdamW(model.parameters(), lr=lr_primal, weight_decay=1e-4)
+
+    for epoch in range(1, max_epochs + 1):
+        A = torch.sigmoid(model.logits / 0.1)
+        consumer_allocations = (A * rel_matrix).sum(dim=1)
+        # objective
+        util = cvar_util(
+            rel_matrix, consumer_allocations, group_assignments, k_rec, model.rho_cvar, alpha_cvar
+        )
+        ci = A.sum(dim=1) - k_rec
+        gj = torch.relu(min_prod - A.sum(dim=0))
+
+        # augmented Lagrangian
+        loss = (
+            util
+            + (alpha * ci).mean()
+            + (beta * gj).mean()
+            + (rho / 2) * (ci.pow(2).mean())
+            + (rho / 2) * (gj.pow(2).mean())
+        )
+
+        opt.zero_grad()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=3.0)
+        opt.step()
+
+        with torch.no_grad():
+            alpha += lr_dual * ci
+            beta += lr_dual * gj
+            beta.clamp_(min=0.0)
+
+        if verbose and epoch % 500 == 0:
+            with torch.no_grad():
+                max_ci = ci.abs().max().item()
+                min_prod_rec = (A.round().sum(axis=0)).min().item()
+                print(
+                    f"Epoch {epoch}: util={util.item():.4f}, max|ci|={max_ci:.4f}, min_prod={min_prod_rec:.4f}"
+                )
+
+    return torch.sigmoid(model.logits).detach().numpy()

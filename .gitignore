@@ -13,3 +13,6 @@ wheels/
 data/
 lightning_logs/
 *.pth
+*.lic
+*.pt
+.DS_Store
