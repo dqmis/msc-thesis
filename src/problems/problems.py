@@ -73,6 +73,8 @@ def _compute_consumer_optimal_solution_min(
     that maximizes the minimal consumer utility given a fixed number of producers to recommend.
     """
 
+    greedy_allocations_per_consumer = np.sort(rel_matrix, axis=1)[:, -k_rec:].sum(axis=1)
+
     allocations = cp.Variable(rel_matrix.shape, boolean=True)
     # constraints
     constraints = [
@@ -84,10 +86,13 @@ def _compute_consumer_optimal_solution_min(
 
     # maximize the mean consumer utility
     problem = cp.Problem(
-        cp.Maximize(cp.min(cp.sum(cp.multiply(allocations, rel_matrix), axis=1))),
+        cp.Maximize(cp.min(cp.sum(cp.multiply(allocations, rel_matrix), axis=1) / rel_matrix.max(axis=1))),
         constraints,
     )
-    problem.solve(solver=solver)
+    if solver == cp.GUROBI:
+        problem.solve(solver=cp.GUROBI, warm_start=True, **{"MIPGap": 1})
+    else:
+        problem.solve(solver=solver)
 
     return problem.value, problem.variables()[0].value
 
@@ -100,6 +105,8 @@ def _compute_consumer_optimal_solution_mean(
     that maximizes the mean consumer utility given a fixed number of producers to recommend.
     """
 
+    greedy_allocations_per_consumer = np.sort(rel_matrix, axis=1)[:, -k_rec:].sum(axis=1)
+
     allocations = cp.Variable(rel_matrix.shape, boolean=True)
     # constraints
     constraints = [
@@ -111,7 +118,7 @@ def _compute_consumer_optimal_solution_mean(
 
     # maximize the mean consumer utility
     problem = cp.Problem(
-        cp.Maximize(cp.mean(cp.sum(cp.multiply(allocations, rel_matrix), axis=1))),
+        cp.Maximize(cp.mean(cp.sum(cp.multiply(allocations, rel_matrix), axis=1) / rel_matrix.max(axis=1))),
         constraints,
     )
     problem.solve(solver=solver)
@@ -262,7 +269,7 @@ def _compute_consumer_optimal_solution_cvar(
     cvar_obj = rho + (1.0 / ((1 - alpha) * G)) * cp.sum(t)
 
     prob = cp.Problem(cp.Minimize(cvar_obj), constraints)
-    prob.solve(solver=cp.GUROBI, warm_start=True, **{"MIPGap": 1e-3})
+    prob.solve(solver=cp.GUROBI, warm_start=True, **{"MIPGap": 1e-4})
     # prob.solve(solver=solver)
 
     return prob.value, x.value

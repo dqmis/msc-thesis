@@ -112,7 +112,7 @@ def compute_consumer_optimal_solution_cvar_grad(
     _ANNEAL_RATE = 0.995
     _MAX_NORM = 5
 
-    _rel_matrix = torch.tensor(rel_matrix)
+    _rel_matrix = torch.tensor(rel_matrix, dtype=torch.float64)
     n, m = _rel_matrix.shape
     model = TwoLayerSelector(n, hidden_dim, m)
 
@@ -149,7 +149,7 @@ def compute_consumer_optimal_solution_cvar_grad(
         loss = l_util + l_card + l_prod + l_bin
 
         if epoch % 500 == 0:
-            improvement = best_loss - loss
+            improvement = abs(best_loss - loss)
             if improvement > patience_delta:
                 # real improvement: save & reset
                 torch.save(model.state_dict(), "best_model.pth")
@@ -188,29 +188,18 @@ def compute_consumer_optimal_with_augmented_lagrangian_cvar(
     rho: float = 10.0,
     max_epochs: int = 5000,
     verbose: bool = False,
+    device: str = "cpu",
+    max_patience: int = 5,  # ✱ added argument for early stopping
+    patience_delta: float = 1e-4,  # ✱ added argument for early stopping
 ) -> torch.Tensor:
     """
-    Augmented Lagrangian primal-dual solver:
+    Augmented Lagrangian primal‐dual solver:
       maximize mean utility under sum_j A[i,j]=k_rec and sum_i A[i,j]>=gamma*U constraints.
-
-    Args:
-        rel_matrix: (n, m) tensor of relevances.
-        allocations: (n, m) tensor for storing allocation results.
-        group_assignments: (n,) tensor for consumer group assignments.
-        k_rec: per-consumer recommendation count.
-        producer_max_min_utility: U_max reference.
-        gamma: fraction of U_max floor.
-        lr_primal: LR for primal (alloc) Adam.
-        lr_dual: LR for dual ascent.
-        rho: penalty parameter for augmented terms.
-        max_epochs: training steps.
-        verbose: print diagnostics.
-    Returns:
-        A: (n, m) allocation matrix in [0,1].
+    Early stopping is triggered if the overall augmented‐Lagrangian loss does not improve
+    by at least `patience_delta` for `max_patience` consecutive checks (every 500 epochs).
     """
-
-    rel_matrix = torch.tensor(rel_matrix, dtype=torch.float32)
-    group_assignments = torch.tensor(group_assignments, dtype=torch.int64)
+    rel_matrix = torch.tensor(rel_matrix, dtype=torch.float64).to(device)
+    group_assignments = torch.tensor(group_assignments, dtype=torch.int64).to(device)
 
     class CVaRModule(nn.Module):
         def __init__(self, n: int, m: int):
@@ -219,20 +208,23 @@ def compute_consumer_optimal_with_augmented_lagrangian_cvar(
             self.logits = nn.Parameter(torch.zeros(n, m))
 
     model = CVaRModule(rel_matrix.shape[0], rel_matrix.shape[1])
+    model.to(device)
 
     n, m = rel_matrix.shape
-    # primal logits
     # dual vars
-    alpha = torch.zeros(n, requires_grad=False)
-    beta = torch.zeros(m, requires_grad=False)
+    alpha = torch.zeros(n, requires_grad=False).to(device)
+    beta = torch.zeros(m, requires_grad=False).to(device)
     min_prod = math.ceil(producer_max_min_utility * gamma)
 
     opt = optim.AdamW(model.parameters(), lr=lr_primal, weight_decay=1e-4)
 
+    # ✱ Initialize early‐stopping variables:
+    best_loss = float("inf")
+    patience = max_patience
+
     for epoch in range(1, max_epochs + 1):
         A = torch.sigmoid(model.logits / 0.1)
         consumer_allocations = (A * rel_matrix).sum(dim=1)
-        # objective
         util = cvar_util(
             rel_matrix, consumer_allocations, group_assignments, k_rec, model.rho_cvar, alpha_cvar
         )
@@ -247,6 +239,21 @@ def compute_consumer_optimal_with_augmented_lagrangian_cvar(
             + (rho / 2) * (ci.pow(2).mean())
             + (rho / 2) * (gj.pow(2).mean())
         )
+
+        # ✱ Early‐stopping check every 500 epochs (and at epoch 1)
+        if epoch == 1 or (epoch % 500 == 0):
+            improvement = abs(best_loss - loss.item())
+            if improvement > patience_delta:
+                # save current best and reset patience
+                torch.save(model.state_dict(), "best_model_aug.pth")
+                best_loss = loss.item()
+                patience = max_patience
+            else:
+                patience -= 1
+                if patience == 0:
+                    if verbose:
+                        print(f"Early stopping at epoch {epoch}: no loss improvement > {patience_delta}")
+                    break
 
         opt.zero_grad()
         loss.backward()
@@ -266,4 +273,10 @@ def compute_consumer_optimal_with_augmented_lagrangian_cvar(
                     f"Epoch {epoch}: util={util.item():.4f}, max|ci|={max_ci:.4f}, min_prod={min_prod_rec:.4f}"
                 )
 
-    return torch.sigmoid(model.logits).detach().numpy()
+    # ✱ Load the best‐saved state (if it exists)
+    try:
+        model.load_state_dict(torch.load("best_model_aug.pth"))
+    except FileNotFoundError:
+        pass
+
+    return torch.sigmoid(model.logits).detach().cpu().numpy()
