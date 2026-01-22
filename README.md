@@ -1,12 +1,9 @@
-# Fairness-Aware Recommendation Systems
+# Equity by Design: Fairness-Driven Recommendation in Heterogeneous Two-Sided Markets
 
-This repository contains the code and experiments developed as part of my Master's Thesis: **"Fairness in Two-Sided Recommendation Systems"**.
+Recommendation systems typically optimize for consumer relevance, but this can unintentionally disadvantage niche users or small producers. This work formalizes consumer utility (relevance) and producer utility (exposure), and introduces Conditional Value at Risk (CVaR) as an optimization objective to directly target fairness.
 
 The project investigates fairness in multi-stakeholder marketplaces (e.g., platforms with both consumers and producers) and proposes optimization methods that balance consumer satisfaction with equitable producer exposure. It integrates machine learning recommender models with fairness-aware allocation strategies and evaluates their performance on real-world and synthetic datasets.
 
-## 📖 Thesis Summary
-
-Recommendation systems typically optimize for consumer relevance, but this can unintentionally disadvantage niche users or small producers. This work formalizes consumer utility (relevance) and producer utility (exposure), and introduces Conditional Value at Risk (CVaR) as an optimization objective to directly target fairness.
 
 ### Key Contributions:
 
@@ -35,7 +32,6 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ```bash
 git clone <your-repo-url>
-cd msc-thesis
 uv sync
 ```
 
@@ -61,7 +57,9 @@ uv run python -c "import cvxpy, torch, numpy; print('Installation successful!')"
 │   ├── ml-100k/               # MovieLens 100K dataset
 │   ├── *_predictions.npy      # Model predictions
 │   └── *_user_groups.json     # User group assignments
+├── outputs/                    # Output files (logs, results)
 └── results/                    # Experimental results and visualizations
+
 ```
 
 ## 🔬 Reproducing Results
@@ -154,10 +152,6 @@ Key dependencies include:
 - **Matplotlib/Seaborn**: Visualization
 
 See `pyproject.toml` for the complete dependency list.
-
-## 🤝 Contributing
-
-This is a thesis repository, but suggestions and improvements are welcome! Please open an issue for any questions or problems.
 
 ### Common Issues:
 
